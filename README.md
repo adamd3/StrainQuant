@@ -11,6 +11,8 @@
 
 **StrainQuant** is a Nextflow pipeline for performing strain-specific bacterial RNA-Seq analysis without a reference genome.
 
+![StrainQuant](docs/images/OrthoQuant_pipeline.png)
+
 ## Pipeline summary
 
 The pipeline requires the output from a pan-genome analysis with [`Panaroo`](https://gtonkinhill.github.io/panaroo/) and will perform the following steps:
