@@ -4,9 +4,9 @@ nextflow.enable.dsl=2
 
 /*
 ================================================================================
-    OrthoQuant: strain-specific analysis of bacterial RNA-Seq data
+    StrainQuant: strain-specific analysis of bacterial RNA-Seq data
 ================================================================================
-    Github : [github.com/adamd3/OrthoQuant]
+    Github : [github.com/adamd3/StrainQuant]
 */
 
 // Show help message
@@ -224,7 +224,7 @@ def helpMessage() {
     log.info"""
     Usage:
     The typical command for running the pipeline is as follows:
-      nextflow run OrthoQuant --meta_file [file] --gpa_file [gene_presence_absence.csv] --group [str] --perc [str] --norm_method [str] -profile conda
+      nextflow run StrainQuant --meta_file [file] --gpa_file [gene_presence_absence.csv] --group [str] --perc [str] --norm_method [str] -profile conda
 
     Mandatory arguments:
       --meta_file [file]              Path to file containing sample metadata.

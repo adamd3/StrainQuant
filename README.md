@@ -1,6 +1,6 @@
-![OrthoQuant](docs/images/OrthoQuant_light.png#gh-light-mode-only) ![OrthoQuant](docs/images/OrthoQuant_dark.png#gh-dark-mode-only)
+![StrainQuant](docs/images/StrainQuant_light.png#gh-light-mode-only) ![StrainQuant](docs/images/StrainQuant_dark.png#gh-dark-mode-only)
 
-![OrthoQuant](https://github.com/adamd3/OrthoQuant/actions/workflows/ci.yml/badge.svg)
+![StrainQuant](https://github.com/adamd3/StrainQuant/actions/workflows/ci.yml/badge.svg)
 
 
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A521.10.3-23aa62.svg?labelColor=000000)](https://www.nextflow.io/)
@@ -10,7 +10,7 @@
 
 ## Introduction
 
-**OrthoQuant** is a Nextflow pipeline for performing strain-specific bacterial RNA-Seq analysis without a reference genome.
+**StrainQuant** is a Nextflow pipeline for performing strain-specific bacterial RNA-Seq analysis without a reference genome.
 
 ## Pipeline summary
 
@@ -30,7 +30,7 @@ You will need to install [`Nextflow`](https://www.nextflow.io/) (version 21.10.3
 
 You can run the pipeline as follows:
 
-    nextflow run /path/to/OrthoQuant \
+    nextflow run /path/to/StrainQuant \
         --meta_file /path/to/metadata.txt \
         --gpa_file /path/to/gene_presence_absence.csv \
         --perc 99 --norm_method DESeq --group majority_ST \
@@ -68,9 +68,9 @@ Explanation of parameters:
 
     ```console
     rna_sample_id	dna_sample_id	sample_name	majority_ST	level7000	acsA	aroE	guaA	mutL	nuoD	ppsA	trpE	patient	collection_date	cohort	infection_type	fastq1	fastq2	fasta	
-    SRX5123742	SRR8737281	ZG301975	313	2	47	8	7	6	8	11	40	ZG301975		hzi_amr		https://raw.githubusercontent.com/adamd3/OrthoQuant/main/test_data/SRX5123742_T1_sub.fq.gz		https://raw.githubusercontent.com/adamd3/OrthoQuant/main/test_data/SRR8737281.fna	
-    SRX5123741	SRR8737282	ZG205864	111	3	17	5	5	4	4	4	3	ZG205864		hzi_amr		https://raw.githubusercontent.com/adamd3/OrthoQuant/main/test_data/SRX5123741_T1_sub.fq.gz		https://raw.githubusercontent.com/adamd3/OrthoQuant/main/test_data/SRR8737282.fna	
-    SRX5123744	SRR8737283	ZG302367	274	4	23	5	11	7	1	12	7	ZG302367		hzi_amr	ear infection	https://raw.githubusercontent.com/adamd3/OrthoQuant/main/test_data/SRX5123744_T1_sub.fq.gz		https://raw.githubusercontent.com/adamd3/OrthoQuant/main/test_data/SRR8737283.fna	
+    SRX5123742	SRR8737281	ZG301975	313	2	47	8	7	6	8	11	40	ZG301975		hzi_amr		https://raw.githubusercontent.com/adamd3/StrainQuant/main/test_data/SRX5123742_T1_sub.fq.gz		https://raw.githubusercontent.com/adamd3/StrainQuant/main/test_data/SRR8737281.fna	
+    SRX5123741	SRR8737282	ZG205864	111	3	17	5	5	4	4	4	3	ZG205864		hzi_amr		https://raw.githubusercontent.com/adamd3/StrainQuant/main/test_data/SRX5123741_T1_sub.fq.gz		https://raw.githubusercontent.com/adamd3/StrainQuant/main/test_data/SRR8737282.fna	
+    SRX5123744	SRR8737283	ZG302367	274	4	23	5	11	7	1	12	7	ZG302367		hzi_amr	ear infection	https://raw.githubusercontent.com/adamd3/StrainQuant/main/test_data/SRX5123744_T1_sub.fq.gz		https://raw.githubusercontent.com/adamd3/StrainQuant/main/test_data/SRR8737283.fna	
     ```
 
 - __Gene presence-absence file__: CSV-format output produced by [`Panaroo`](https://gtonkinhill.github.io/panaroo/).
