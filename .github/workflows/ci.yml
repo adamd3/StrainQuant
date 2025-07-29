@@ -1,4 +1,4 @@
-name: OrthoQuant CI
+name: StrainQuant CI
 
 on:
   push:
@@ -13,7 +13,7 @@ env:
 jobs:
   test:
     name: Run pipeline with test data
-    if: "${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'adamd3/OrthoQuant') }}"
+    if: "${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'adamd3/StrainQuant') }}"
     runs-on: ubuntu-latest
     strategy:
       matrix:
