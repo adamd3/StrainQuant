@@ -36,20 +36,18 @@ process DESEQ_NORMALISE_COUNTS {
     path gene_subset
 
     output:
-    path 'deseq2_norm_counts.tsv', emit: norm_counts
-    path 'deseq2_rpkm_counts.tsv', emit: rpkm_counts
-    path 'deseq2_raw_counts.tsv', emit: scaled_counts
+    path 'norm_counts.tsv', emit: norm_counts
+    path 'rpkm_counts.tsv', emit: rpkm_counts
+    path 'raw_counts.tsv', emit: scaled_counts
 
     script:
-    def prefix = "deseq2"
     """
     DESeq2_normalise_counts.R \
         -c $merged_counts \
         -l $merged_lens \
         -g $gene_subset \
         -p FALSE -t TRUE \
-        -o ./ \
-        --prefix ${prefix}
+        -o ./
     """
 }
 
@@ -64,19 +62,17 @@ process TMM_NORMALISE_COUNTS {
     path gene_subset
 
     output:
-    path 'tmm_norm_counts.tsv', emit: norm_counts
-    path 'tmm_rpkm_counts.tsv', emit: rpkm_counts
-    path 'tmm_raw_counts.tsv', emit: scaled_counts
+    path 'norm_counts.tsv', emit: norm_counts
+    path 'rpkm_counts.tsv', emit: rpkm_counts
+    path 'raw_counts.tsv', emit: scaled_counts
 
     script:
-    def prefix = "tmm"
     """
     TMM_normalise_counts.R \
         -c $merged_counts \
         -l $merged_lens \
         -g $gene_subset \
         -p FALSE -t TRUE \
-        -o ./ \
-        --prefix ${prefix}
+        -o ./
     """
 }
