@@ -1,5 +1,7 @@
 #!/usr/bin/env nextflow
 
+nextflow.enable.dsl=2
+
 /*
 ================================================================================
     StrainQuant: strain-specific analysis of bacterial RNA-Seq data
