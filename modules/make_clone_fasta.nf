@@ -1,6 +1,7 @@
 process MAKE_CLONE_FASTA {
      tag "$name"
      maxForks 20 // maximum number of files to process in parallel (TODO: make this a parameter)
+     container 'adamd3/strainseq:latest'
      publishDir "${params.outdir}/clone_fasta", mode: 'copy'
 
      input:

@@ -1,6 +1,24 @@
 process TRIMGALORE {
+    meta {
+        description = "Performs adapter trimming and quality control of raw sequencing reads using TrimGalore"
+        keywords    = ["trimming", "adapter removal", "quality control", "fastqc", "preprocessing"]
+        authors     = ["@adamd3"]
+        input       = [
+            [ val(meta), "Sample metadata map containing sample information" ],
+            [ path(reads), "Raw FASTQ files (single-end or paired-end)" ],
+            [ path(fasta), "Reference FASTA file" ]
+        ]
+        output      = [
+            [ path("*{trimmed,val}*.fq.gz"), "Quality-trimmed FASTQ files" ],
+            [ path("*.txt"), "TrimGalore trimming reports for MultiQC" ],
+            [ path("*.{zip,html}"), "FastQC quality control reports" ],
+            [ path("*unpaired*.fq.gz"), "Unpaired reads from paired-end trimming (optional)" ]
+        ]
+    }
+
     tag "$meta.sample_id"
     label 'process_high'
+    container 'adamd3/strainseq:latest'
     publishDir "${params.outdir}/trim_galore", mode: 'copy',
         saveAs: { filename ->
                       if (filename.endsWith('.html')) "fastqc/$filename"
@@ -8,15 +26,6 @@ process TRIMGALORE {
                       else if (filename.endsWith('trimming_report.txt')) "logs/$filename"
                       else params.save_trimmed ? filename : null
                 }
-
-    // input:
-    // tuple val(name), path(reads)
-
-    // output:
-    // path '*trimmed.fq.gz', emit: trimmed_reads
-    // path '*.txt', emit: trimgalore_results_mqc
-    // path '*.{zip,html}', emit: trimgalore_fastqc_reports_mqc
-
 
     input:
     tuple val(meta), path(reads), path(fasta)
@@ -27,6 +36,8 @@ process TRIMGALORE {
     tuple val(meta), path("*.{zip,html}")                       , emit: trimgalore_fastqc_reports_mqc
     tuple val(meta), path("*unpaired*.fq.gz")                   , emit: unpaired, optional: true
 
+    when:
+    !params.skip_trimming
 
     script:
     // Calculate number of --cores for TrimGalore based on value of task.cpus

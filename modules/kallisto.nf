@@ -1,7 +1,24 @@
 process KALLISTO_QUANT {
+    meta {
+        description = "Performs pseudo-alignment and quantification of RNA-Seq reads against strain-specific gene sequences using Kallisto"
+        keywords    = ["quantification", "pseudo-alignment", "kallisto", "rna-seq", "strain-specific"]
+        authors     = ["@adamd3"]
+        input       = [
+            [ path(gpa), "Gene presence/absence file defining strain-specific gene sets" ],
+            [ val(meta), "Sample metadata map" ],
+            [ path(reads), "Quality-trimmed FASTQ files" ],
+            [ path(fasta), "Reference FASTA file containing gene sequences" ],
+            [ val(strandedness), "Library strandedness (0=unstranded, 1=fr-stranded, 2=rf-stranded)" ]
+        ]
+        output      = [
+            [ path("kallisto_*"), "Kallisto quantification output directory containing abundance estimates" ]
+        ]
+    }
+
     tag "$meta.sample_id"
     label 'process_high'
-    publishDir "${params.outdir}/kallisto_quant", mode: 'copy'
+    container 'adamd3/strainseq:latest'
+    publishDir "${params.outdir}/kallisto_quant", mode: 'symlink'
 
     input:
     path gpa
@@ -45,9 +62,25 @@ process KALLISTO_QUANT {
 
 
 process MERGE_COUNTS_AND_LENS {
+    meta {
+        description = "Merges Kallisto quantification results across all samples and extracts gene length information"
+        keywords    = ["merge", "counts", "gene lengths", "kallisto", "matrix"]
+        authors     = ["@adamd3"]
+        input       = [
+            [ path(gpa_file), "Gene presence/absence file" ],
+            [ path(kallisto_dirs), "Collection of Kallisto output directories from all samples" ],
+            [ path(meta_merged), "Merged sample metadata file" ]
+        ]
+        output      = [
+            [ path("kallisto_merged_counts.tsv"), "Merged gene count matrix across all samples" ],
+            [ path("kallisto_merged_lens.tsv"), "Gene length matrix for normalization" ]
+        ]
+    }
+
     tag "merge_counts_and_lens"
     label 'process_high'
-    publishDir "${params.outdir}/kallisto_quant", mode: 'copy'
+    container 'adamd3/strainseq:latest'
+    publishDir "${params.outdir}/kallisto_quant", mode: 'symlink'
 
     input:
     path gpa_file
@@ -55,18 +88,20 @@ process MERGE_COUNTS_AND_LENS {
     path meta_merged
 
     output:
-    tuple path('kallisto_merged_counts.tsv'), path('kallisto_merged_lens.tsv'), emit: kallisto_merged_out
+    tuple path('kallisto_merged_counts_*.tsv'), path('kallisto_merged_lens_*.tsv'), emit: kallisto_merged_out
 
     script:
+    def counts_file = "kallisto_merged_counts_${gpa_file.baseName}_${meta_merged.baseName}.tsv"
+    def lens_file = "kallisto_merged_lens_${gpa_file.baseName}_${meta_merged.baseName}.tsv"
     """
     merge_kallisto_counts.py \
         --gene_presence_absence=$gpa_file \
         --metadata_merged=$meta_merged \
-        --outf=kallisto_merged_counts.tsv
+        --outf=${counts_file}
 
     merge_kallisto_lens.py \
         --gene_presence_absence=$gpa_file \
         --metadata_merged=$meta_merged \
-        --outf=kallisto_merged_lens.tsv
+        --outf=${lens_file}
     """
 }
