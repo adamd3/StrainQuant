@@ -1,18 +1,4 @@
 process SUBSET_GENES {
-    meta {
-        description = "Filters genes based on presence across strains to create a strain-typing gene set"
-        keywords    = ["gene filtering", "strain typing", "gene presence", "subset"]
-        authors     = ["@adamd3"]
-        input       = [
-            [ path(gpa_file), "Gene presence/absence file" ],
-            [ path(meta_merged), "Merged sample metadata file" ],
-            [ val(perc), "Minimum percentage threshold for gene presence across samples" ]
-        ]
-        output      = [
-            [ path("gene_set_ST.tsv"), "Filtered gene set suitable for strain typing analysis" ]
-        ]
-    }
-
     tag "$meta_merged"
     label 'process_medium'
     container 'adamd3/strainseq:latest'
@@ -40,22 +26,6 @@ process SUBSET_GENES {
 
 
 process DESEQ_NORMALISE_COUNTS {
-    meta {
-        description = "Normalizes gene count data using DESeq2 size factors and calculates RPKM values"
-        keywords    = ["normalization", "deseq2", "rpkm", "size factors", "gene expression"]
-        authors     = ["@adamd3"]
-        input       = [
-            [ path(merged_counts), "Merged gene count matrix" ],
-            [ path(merged_lens), "Gene length matrix" ],
-            [ path(gene_subset), "Filtered gene set for analysis" ]
-        ]
-        output      = [
-            [ path("norm_counts.tsv"), "DESeq2 normalized gene counts" ],
-            [ path("rpkm_counts.tsv"), "RPKM normalized gene expression values" ],
-            [ path("raw_counts.tsv"), "Raw gene counts scaled by library size" ]
-        ]
-    }
-
     tag "$merged_counts"
     label 'process_medium'
     container 'adamd3/strainseq:latest'
@@ -84,22 +54,6 @@ process DESEQ_NORMALISE_COUNTS {
 }
 
 process TMM_NORMALISE_COUNTS {
-    meta {
-        description = "Normalizes gene count data using Trimmed Mean of M-values (TMM) method and calculates RPKM values"
-        keywords    = ["normalization", "tmm", "rpkm", "edger", "gene expression"]
-        authors     = ["@adamd3"]
-        input       = [
-            [ path(merged_counts), "Merged gene count matrix" ],
-            [ path(merged_lens), "Gene length matrix" ],
-            [ path(gene_subset), "Filtered gene set for analysis" ]
-        ]
-        output      = [
-            [ path("norm_counts.tsv"), "TMM normalized gene counts" ],
-            [ path("rpkm_counts.tsv"), "RPKM normalized gene expression values" ],
-            [ path("raw_counts.tsv"), "Raw gene counts scaled by library size" ]
-        ]
-    }
-
     tag "$merged_counts"
     label 'process_medium'
     container 'adamd3/strainseq:latest'

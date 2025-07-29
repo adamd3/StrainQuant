@@ -1,21 +1,4 @@
 process TRIMGALORE {
-    meta {
-        description = "Performs adapter trimming and quality control of raw sequencing reads using TrimGalore"
-        keywords    = ["trimming", "adapter removal", "quality control", "fastqc", "preprocessing"]
-        authors     = ["@adamd3"]
-        input       = [
-            [ val(meta), "Sample metadata map containing sample information" ],
-            [ path(reads), "Raw FASTQ files (single-end or paired-end)" ],
-            [ path(fasta), "Reference FASTA file" ]
-        ]
-        output      = [
-            [ path("*{trimmed,val}*.fq.gz"), "Quality-trimmed FASTQ files" ],
-            [ path("*.txt"), "TrimGalore trimming reports for MultiQC" ],
-            [ path("*.{zip,html}"), "FastQC quality control reports" ],
-            [ path("*unpaired*.fq.gz"), "Unpaired reads from paired-end trimming (optional)" ]
-        ]
-    }
-
     tag "$meta.sample_id"
     label 'process_high'
     container 'adamd3/strainseq:latest'
