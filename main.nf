@@ -1,7 +1,5 @@
 #!/usr/bin/env nextflow
 
-nextflow.enable.dsl=2
-
 /*
 ================================================================================
     StrainQuant: strain-specific analysis of bacterial RNA-Seq data
@@ -29,21 +27,37 @@ if (!(workflow.runName ==~ /[a-z]+_[a-z]+/)) {
 ================================================================================
 */
 
-if (params.meta_file) {
-    ch_samples = file(params.meta_file, checkIfExists: true)
-} else { exit 1, 'Metadata file not specified!' }
+// Validate required parameters
+if (!params.meta_file) {
+    exit 1, 'ERROR: --meta_file parameter is required. Please provide a path to the metadata file.'
+}
+if (!params.gpa_file) {
+    exit 1, 'ERROR: --gpa_file parameter is required. Please provide a path to the gene presence/absence file.'
+}
+if (!params.group) {
+    exit 1, 'ERROR: --group parameter is required. Please specify the metadata column for grouping strains.'
+}
 
-// if (params.multifasta_file) {
-//     ch_multifasta_file = file(params.multifasta_file, checkIfExists: true)
-// } else { exit 1, 'Multi-fasta file not specified!' }
+// Validate parameter values
+if (params.strandedness !in [0, 1, 2]) {
+    exit 1, 'ERROR: --strandedness must be 0 (unstranded), 1 (forward-stranded), or 2 (reverse-stranded).'
+}
+if (params.norm_method !in ['DESeq', 'TMM']) {
+    exit 1, 'ERROR: --norm_method must be either "DESeq" or "TMM".'
+}
+if (params.perc < 0 || params.perc > 100) {
+    exit 1, 'ERROR: --perc must be between 0 and 100.'
+}
+if (params.fragment_len <= 0) {
+    exit 1, 'ERROR: --fragment_len must be greater than 0.'
+}
+if (params.fragment_sd <= 0) {
+    exit 1, 'ERROR: --fragment_sd must be greater than 0.'
+}
 
-// if (params.faidx_file) {
-//     ch_faidx_file = file(params.faidx_file, checkIfExists: true)
-// } else { exit 1, 'Index for multi-fasta file not specified!' }
-
-if (params.gpa_file) {
-    ch_gpa_file = file(params.gpa_file, checkIfExists: true)
-} else { exit 1, 'Gene presence/absence file not specified!' }
+// Create file channels with validation
+ch_samples = file(params.meta_file, checkIfExists: true)
+ch_gpa_file = file(params.gpa_file, checkIfExists: true)
 
 
 
@@ -54,7 +68,6 @@ if (params.gpa_file) {
 ================================================================================
 */
 include {CHECK_META_FILE} from './modules/metadata'
-// include {MAKE_CLONE_FASTA} from './modules/make_clone_fasta'
 include {TRIMGALORE} from './modules/trim_reads'
 include {KALLISTO_QUANT; MERGE_COUNTS_AND_LENS} from './modules/kallisto'
 include {SUBSET_GENES; TMM_NORMALISE_COUNTS; DESEQ_NORMALISE_COUNTS} from './modules/normalisation'
@@ -133,14 +146,13 @@ workflow {
             ch_raw_reads_trimgalore,
             params.strandedness
         )
-        ch_kallisto_out_dirs = KALLISTO_QUANT.out.kallisto_out_dirs.collect()
+        ch_kallisto_out_dirs = KALLISTO_QUANT.out.kallisto_out_dirs
 
     } else {
 
         TRIMGALORE (
             ch_raw_reads_trimgalore
         )
-        // ch_trimmed_reads = TRIMGALORE.out.trimmed_reads.collect()
         ch_trimmed_reads = TRIMGALORE.out.trimmed_reads
         ch_trimgalore_results_mqc = TRIMGALORE.out.trimgalore_results_mqc
         ch_trimgalore_fastqc_reports_mqc = TRIMGALORE.out.trimgalore_fastqc_reports_mqc
@@ -150,7 +162,7 @@ workflow {
             ch_trimmed_reads,
             params.strandedness
         )
-        ch_kallisto_out_dirs = KALLISTO_QUANT.out.kallisto_out_dirs.collect()
+        ch_kallisto_out_dirs = KALLISTO_QUANT.out.kallisto_out_dirs
     }
 
     /*
@@ -158,19 +170,11 @@ workflow {
      */
     MERGE_COUNTS_AND_LENS (
         ch_gpa_file,
-        ch_kallisto_out_dirs,
+        ch_kallisto_out_dirs.collect(),
         ch_metadata
     )
     ch_kallisto_merged_out = MERGE_COUNTS_AND_LENS.out.kallisto_merged_out
 
-    // /*
-    //  *  Scale counts to median gene length across strains
-    //  */
-    // LENGTH_SCALE_COUNTS (
-    //     ch_kallisto_merged_out,
-    //     ch_gene_subset
-    // )
-    // ch_scaled_counts = LENGTH_SCALE_COUNTS.out.scaled_counts
 
     /*
      *  Get size-factor-scaled counts
@@ -190,7 +194,6 @@ workflow {
         ch_norm_counts = TMM_NORMALISE_COUNTS.out.norm_counts
         ch_scaled_counts = TMM_NORMALISE_COUNTS.out.scaled_counts
     }
-    // NB the scaled counts are log-transformed by default; the RPKM counts are not
 
     /*
      *  UMAP of samples
